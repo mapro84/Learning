@@ -17,8 +17,8 @@ $skills = $entities['skills'] ?? [];
 <?php if(!empty($messages['info'])){ ?>
   <div class="alert alert-success" role="alert">
   <?php
-				echo $messages['info'];
-				?>
+    echo $messages['info'];
+  ?>
   </div>
   <?php }elseif(!empty($messages['error'])){ ?>
   <div class="alert alert-danger" role="alert">

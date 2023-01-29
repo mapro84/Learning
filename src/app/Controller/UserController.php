@@ -14,27 +14,26 @@ class UserController extends AppController {
 	private $privilege_id;
 
 	public function login(){
-
 		if(isset($_POST['username']) && isset($_POST['password'])){
 			$username = addslashes($_POST['username']);
 			$password = addslashes($_POST['password']);
-			if(Check::is_safe_string($username)  && Check::is_safe_password($password)){
+
+            $this->providePrivilege($username,$password);
+            // TODO check fields
+ 			/*if(Check::is_safe_string($username)  && Check::is_safe_password($password)){
 				$this->providePrivilege($username,$password);
-			}else{
-				array_push($this->messages['errors'], "Seems Malicious Login");
-				$entities = ['messages' => $this->messages];
-				$this->render('user/login',$entities);
-			}
-		}else{
-			$entities = ['messages' => $this->messages];
-        	$this->render('user/login',$entities);
+			}*/
 		}
-		
 		return true;
 	}
 	
 	private function providePrivilege($username,$password){
 		$this->user = DBAuth::login($username,$password);
+
+        echo 'user';
+        var_dump($this->user );
+
+
 		if($this->user !== false){
 			if($this->privilege_id == '1'){
 				$this->logUser();
@@ -42,7 +41,7 @@ class UserController extends AppController {
 				$boController->show();
 			}else{
 				array_push($this->messages['infos'], "You are loggued as Invited");
-				array_push($this->messages['infos'], "For more privilege ask your Administrator");
+				array_push($this->messages['infos'], "For more privileges ask your Administrator");
 				$entities = ['messages' => $this->messages];
 				$this->render('user/login',$entities);
 			}
