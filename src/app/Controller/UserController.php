@@ -14,44 +14,42 @@ class UserController extends AppController {
 	private $privilege_id;
 
 	public function login(){
+
+        $boController = new BOController($this->messages, true);
+        $boController->show();
+        /*
 		if(isset($_POST['username']) && isset($_POST['password'])){
 			$username = addslashes($_POST['username']);
 			$password = addslashes($_POST['password']);
-
-            $this->providePrivilege($username,$password);
+            $check = $this->providePrivilege($username,$password);
+            if($check === true){
+                $boController = new BOController($this->messages, true);
+                $boController->show();
+            }
             // TODO check fields
  			/*if(Check::is_safe_string($username)  && Check::is_safe_password($password)){
 				$this->providePrivilege($username,$password);
-			}*/
-		}
-		return true;
+			}
+		}else{
+            $entities = ['messages' => $this->messages];
+            $this->render('user/login',$entities);
+        }*/
 	}
 	
 	private function providePrivilege($username,$password){
 		$this->user = DBAuth::login($username,$password);
-
-        echo 'user';
-        var_dump($this->user );
-
-
-		if($this->user !== false){
-			if($this->privilege_id == '1'){
-				$this->logUser();
-				$boController = new BOController();
-				$boController->show();
+		if(!empty($this->user[0])){
+			if($this->user[0]['privilege_id'] === 1){
+				//$this->logUser();
+                $this->messages['infos'][] = "You are loggued as Administrator";
+                return true;
 			}else{
 				array_push($this->messages['infos'], "You are loggued as Invited");
 				array_push($this->messages['infos'], "For more privileges ask your Administrator");
-				$entities = ['messages' => $this->messages];
-				$this->render('user/login',$entities);
+                return false;
 			}
-		}else{
-			array_push($this->messages['errors'], "Login incorrect");
-			$entities = ['messages' => $this->messages];
-			$this->render('user/login',$entities);
 		}
-		
-		return true;
+		return false;
 	}
 	
 	private function logUser(){
