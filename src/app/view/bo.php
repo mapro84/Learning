@@ -3,10 +3,8 @@ use src\app\user\AppUser;
 use src\Core\Utils\Debug;
 use src\Core\Config\Config;
 
-$adm = isset($_GET['adm']) ? addslashes($_GET['adm']) : '';
-$adm = $adm === getenv('admname') ?? '';
-if(getenv('admin') !== 'true' && empty($adm)){
-  echo 'NOT AUTHORIZED';
+if(getenv('admin') !== 'true'){
+    echo 'NOT AUTHORIZED';
 } else {
   $skills = $entities['skills']?? null;
   $items = $entities['items']?? null;
