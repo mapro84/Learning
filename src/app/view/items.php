@@ -80,7 +80,7 @@ $skills = $entities['skills'] ?? [];
 				data-bs-id="'. $item['id'].'" data-bs-name="'. $itemName.'">'.
 				'<i class="fa fa-edit"></i></button>';
 				echo "<div class='row mb-2, border-bottom'>";
-				echo '<div class="col-4">';
+				echo '<div class="col-4 mb-2">';
 				echo $admin === 'true' ? $editButton : '';
 				echo $admin === 'true' ? $deleteButton : '';
 					if (!is_null($item['further']) && Check::isUrl($item['further'])) {
@@ -91,7 +91,7 @@ $skills = $entities['skills'] ?? [];
 						echo '<span class="text-row">'.$itemName.'</span>';
 					}
 					echo '</div>';
-					echo '<div class="col-7">' . $item['description'] . '</div>';
+					echo '<div class="col-7 mb-2">' . $item['description'] . '</div>';
 					echo '<div class="col-1 hidden">';
 						echo '<input type="hidden" id="description'.$item['id'].'" value="'.$item['description'].'">';
 						echo '<input type="hidden" id="further'.$item['id'].'" value="'.$item['further'].'">';
