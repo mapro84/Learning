@@ -10,7 +10,7 @@ class Url extends Entity
 
     public static function findUrlsBy($id, $tableCategory)
     {
-        $query = "SELECT url.id, url.name, url.url FROM url INNER JOIN url_skill_item as usi ON usi.url_id = url.id WHERE usi.{$tableCategory}_id = ?";
+        $query = "SELECT url.id, url.name, url.url FROM url INNER JOIN url_skill_item as usi ON usi.url_id = url.id WHERE usi.{$tableCategory}_id = ? ORDER BY url.name;";
         $parameters = [$id];
         return DB::prepare($query, $parameters);
     }
@@ -18,7 +18,7 @@ class Url extends Entity
     public static function search($keyword)
     {
         $pattern = '%' . $keyword . '%';
-        $query = "SELECT * FROM url as u WHERE u.name LIKE :pattern OR u.url LIKE :pattern; ";
+        $query = "SELECT * FROM url as u WHERE u.name LIKE :pattern OR u.url LIKE :pattern ORDER BY u.name;";
         $parameters = [':pattern' => $pattern];
         return DB::prepare($query, $parameters);
     }
