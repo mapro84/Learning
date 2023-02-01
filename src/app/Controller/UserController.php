@@ -5,54 +5,61 @@ use src\app\user\AppUser;
 use src\Core\Utils\Check;
 use src\Core\Auth\DBAuth;
 use src\Core\Config\Config;
+use src\Core\Utils\Debug;
 
 class UserController extends AppController {
 	
-	private $user;
+	private $user = false;
 	private $id;
 	private $username;
 	private $privilege_id;
 
 	public function login(){
 
-        $boController = new BOController($this->messages, true);
-        $boController->show();
-        /*
+        $privilege = 'null';
 		if(isset($_POST['username']) && isset($_POST['password'])){
 			$username = addslashes($_POST['username']);
 			$password = addslashes($_POST['password']);
-            $check = $this->providePrivilege($username,$password);
-            if($check === true){
+            $privilege = $this->providePrivilege($username,$password);
+            Debug::dump($this->user);
+            if($privilege === 'admin') {
+                //$this->providePrivilege($username,$password);
                 $boController = new BOController($this->messages, true);
-                $boController->show();
+                $boController->show($this->messages, true);
+            }elseif($privilege === 'invited') {
+                $entities = ['messages' => $this->messages];
+                $this->render('user/login',$entities);
+            }elseif($privilege === 'null'){
+                $this->messages['errors'][] = 'Login or password incorrect';
             }
-            // TODO check fields
- 			/*if(Check::is_safe_string($username)  && Check::is_safe_password($password)){
-				$this->providePrivilege($username,$password);
-			}
-		}else{
+		}
+
+        if($privilege === 'null'){
             $entities = ['messages' => $this->messages];
             $this->render('user/login',$entities);
-        }*/
+        }
+
 	}
 	
-	private function providePrivilege($username,$password){
+	private function providePrivilege($username,$password): string
+    {
 		$this->user = DBAuth::login($username,$password);
 		if(!empty($this->user[0])){
 			if($this->user[0]['privilege_id'] === 1){
-				//$this->logUser();
-                $this->messages['infos'][] = "You are loggued as Administrator";
-                return true;
+				$this->logUser();
+                $this->messages['infos'][] = "You are logged as Administrator";
+                return 'admin';
 			}else{
-				array_push($this->messages['infos'], "You are loggued as Invited");
-				array_push($this->messages['infos'], "For more privileges ask your Administrator");
-                return false;
+				$this->messages['infos'][] = "You are logged as Invited";
+				$this->messages['infos'][] = "For more privileges ask your Administrator";
+                return 'invited';
 			}
 		}
-		return false;
+		return 'null';
 	}
 	
-	private function logUser(){
+	private function logUser(): void
+    {
 		//Set the session cookie with SameSite=None
 		$params = session_get_cookie_params();
 		$params['samesite'] = 'None';
@@ -68,9 +75,8 @@ class UserController extends AppController {
 		$_SESSION['auth'] = $this->id;
 		
 		setcookie('user', $this->username, $cookie_lifetime);
-		
-		return true;
-	}
+
+    }
 
 	public function disconnect(){
 		if(isset($_SESSION)) { 
@@ -82,7 +88,7 @@ class UserController extends AppController {
 	}
 	
 	public static function islogged(){
-		return isset($_SESSION['auth']) ? $_SESSION['auth'] : NULL;
+		return $_SESSION['auth'] ?? NULL;
 	}
 
 }
