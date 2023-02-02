@@ -3,7 +3,9 @@ use src\Core\Utils\Debug;
 use src\Core\Utils\Check;
 use src\app\Controller\UserController;
 
-$admin = getenv('admin') && UserController::getConnection();
+if((bool)getenv('admin') === true && UserController::getConnection() === true){
+    $admin = true;
+}
 
 $items = $entities['items'] ?? [];
 $demos = $entities['demos'] ?? [];
