@@ -2,6 +2,7 @@
 namespace src\app\Controller;
 
 use src\app\user\AppUser;
+use src\Core\DB\DB;
 use src\Core\Utils\Check;
 use src\Core\Auth\DBAuth;
 use src\Core\Config\Config;
@@ -9,27 +10,39 @@ use src\Core\Utils\Debug;
 
 class UserController extends AppController {
 	
-	private $user = false;
+	private static $user;
 	private $id;
 	private $username;
 	private $privilege_id;
 
-	public function login(){
+    public static function getConnection(){
+        $query = "SELECT state from connection WHERE state = ? ;";
+        $result = DB::prepare($query, [1]);
+        return $result ? (bool)$result[0]['state'] : null;
+    }
 
+    private static function setConnection($token = 0): void {
+        $query = "UPDATE connection SET state = ? WHERE id = ? ";
+        DB::prepare($query, [$token, 1]);
+    }
+
+	public function login(){
         $privilege = 'null';
 		if(isset($_POST['username']) && isset($_POST['password'])){
 			$username = addslashes($_POST['username']);
 			$password = addslashes($_POST['password']);
             $privilege = $this->providePrivilege($username,$password);
-            Debug::dump($this->user);
             if($privilege === 'admin') {
                 //$this->providePrivilege($username,$password);
+                self::setConnection(1);
                 $boController = new BOController($this->messages, true);
                 $boController->show($this->messages, true);
             }elseif($privilege === 'invited') {
+                self::setConnection();
                 $entities = ['messages' => $this->messages];
                 $this->render('user/login',$entities);
             }elseif($privilege === 'null'){
+                self::setConnection();
                 $this->messages['errors'][] = 'Login or password incorrect';
             }
 		}
@@ -43,10 +56,10 @@ class UserController extends AppController {
 	
 	private function providePrivilege($username,$password): string
     {
-		$this->user = DBAuth::login($username,$password);
-		if(!empty($this->user[0])){
-			if($this->user[0]['privilege_id'] === 1){
-				$this->logUser();
+		self::$user = DBAuth::login($username,$password);
+		if(!empty(self::$user[0])){
+			if(self::$user[0]['privilege_id'] === 1){
+				//$this->logUser();
                 $this->messages['infos'][] = "You are logged as Administrator";
                 return 'admin';
 			}else{
@@ -74,7 +87,7 @@ class UserController extends AppController {
 		//Set the session variable
 		$_SESSION['auth'] = $this->id;
 		
-		setcookie('user', $this->username, $cookie_lifetime);
+		setcookie('user', self::$username, $cookie_lifetime);
 
     }
 

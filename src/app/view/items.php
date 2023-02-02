@@ -1,8 +1,9 @@
 <?php
 use src\Core\Utils\Debug;
 use src\Core\Utils\Check;
+use src\app\Controller\UserController;
 
-$admin = getenv('admin');
+$admin = getenv('admin') && UserController::getConnection();
 
 $items = $entities['items'] ?? [];
 $demos = $entities['demos'] ?? [];
@@ -81,8 +82,8 @@ $skills = $entities['skills'] ?? [];
 				'<i class="fa fa-edit"></i></button>';
 				echo "<div class='row mb-2, border-bottom'>";
 				echo '<div class="col-4 mb-2">';
-				echo $admin === 'true' ? $editButton : '';
-				echo $admin === 'true' ? $deleteButton : '';
+				echo $admin === true ? $editButton : '';
+				echo $admin === true ? $deleteButton : '';
 					if (!is_null($item['further']) && Check::isUrl($item['further'])) {
 							echo '<a class="text-row" href="' . $item['further'] . '" target="_blank">' . $itemName . '</a>';
 					} elseif (!is_null($item['further']) && Check::isPdf($item['further'])) {
@@ -140,8 +141,8 @@ $skills = $entities['skills'] ?? [];
 				'<input type="hidden" name="id" value='.$url['id'].'>' .
 				'<button class="btn"><i class="fa fa-trash"></i></button></form>';
                 echo '<ul><li>';
-				echo $admin === 'true' ? $editButton : '';
-				echo $admin === 'true' ? $deleteButton : '';
+				echo $admin === true ? $editButton : '';
+				echo $admin === true ? $deleteButton : '';
 				echo '<a href="' . $url['url'] . '" target="_blank">' . $url['name'] . '</a>';
                 echo '</li></ul>';
 			}

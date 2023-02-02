@@ -3,12 +3,8 @@ use src\app\user\AppUser;
 use src\Core\Utils\Debug;
 use src\Core\Config\Config;
 
-if(getenv('admin') !== 'true'){
-    echo 'NOT AUTHORIZED';
-} else {
-  $skills = $entities['skills']?? null;
-  $items = $entities['items']?? null;
-  Debug::dump($entities['messages']);
+$skills = $entities['skills']?? null;
+$items = $entities['items']?? null;
 ?>
 
 <div class="container px-4 py-5" id="featured-2">
@@ -179,6 +175,3 @@ boAddNoteButton.dispatchEvent(new Event('click'));
 
 </div>
 </div>
-
-<?php
-}

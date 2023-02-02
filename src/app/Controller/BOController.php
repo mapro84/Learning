@@ -9,7 +9,6 @@ class BOController extends AppController{
 	
 	public function show(array $messages=[], bool $authentication = false) {
         if($authentication === true){
-
             $skills = Entity::getAll('skill');
             $items = Entity::getAll('item');
             $entities = array('skills' => $skills, 'items' => $items, 'messages' => $messages);
