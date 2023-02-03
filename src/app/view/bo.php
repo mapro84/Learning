@@ -1,4 +1,6 @@
-<?php 
+<?php
+
+use src\app\Controller\UserController;
 use src\app\user\AppUser;
 use src\Core\Utils\Debug;
 use src\Core\Config\Config;

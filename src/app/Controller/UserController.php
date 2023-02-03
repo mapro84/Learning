@@ -15,13 +15,17 @@ class UserController extends AppController {
 	private $username;
 	private $privilege_id;
 
-    public static function getConnection(){
+    public static function getAdminConnection(): ?bool
+    {
+        if(getenv('admin') === 'false') {
+            return false;
+        }
         $query = "SELECT state from connection WHERE state = ? ;";
         $result = DB::prepare($query, [1]);
         return $result ? (bool)$result[0]['state'] : null;
     }
 
-    private static function setConnection($token = 0): void {
+    private static function setAdminConnection($token = 0): void {
         $query = "UPDATE connection SET state = ? WHERE id = ? ";
         DB::prepare($query, [$token, 1]);
     }
@@ -32,17 +36,26 @@ class UserController extends AppController {
 			$username = addslashes($_POST['username']);
 			$password = addslashes($_POST['password']);
             $privilege = $this->providePrivilege($username,$password);
-            if($privilege === 'admin') {
+            if($privilege === 'admin'){
                 //$this->providePrivilege($username,$password);
-                self::setConnection(1);
-                $boController = new BOController($this->messages, true);
-                $boController->show($this->messages, true);
+                if(filter_var(getenv('admin'), FILTER_VALIDATE_BOOL) === false){
+                    $this->messages['errors'][] = 'Administration interface not available';
+                    $entities = ['messages' => $this->messages];
+                    $this->render('user/login',$entities);
+                }else{
+                    self::setAdminConnection(1);
+                    $this->messages['infos'][] = "You are logged as Administrator";
+                    $boController = new BOController($this->messages, true);
+                    $boController->show($this->messages, true);
+                }
             }elseif($privilege === 'invited') {
-                self::setConnection();
+                $this->messages['infos'][] = "You are logged as Invited";
+                $this->messages['infos'][] = "For more privileges ask your Administrator";
+                self::setAdminConnection();
                 $entities = ['messages' => $this->messages];
                 $this->render('user/login',$entities);
             }elseif($privilege === 'null'){
-                self::setConnection();
+                self::setAdminConnection();
                 $this->messages['errors'][] = 'Login or password incorrect';
             }
 		}
@@ -60,11 +73,8 @@ class UserController extends AppController {
 		if(!empty(self::$user[0])){
 			if(self::$user[0]['privilege_id'] === 1){
 				//$this->logUser();
-                $this->messages['infos'][] = "You are logged as Administrator";
                 return 'admin';
 			}else{
-				$this->messages['infos'][] = "You are logged as Invited";
-				$this->messages['infos'][] = "For more privileges ask your Administrator";
                 return 'invited';
 			}
 		}

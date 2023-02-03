@@ -4,7 +4,11 @@ use src\app\Controller\UserController;
 
 $notes = $entities['notes']?? null;
 $messages = $entities['messages']?? null;
-$admin = getenv('admin') && UserController::getConnection();
+
+$admin = false;
+if(UserController::getAdminConnection() === true){
+    $admin = true;
+}
 ?>
 
 <div class="container px-4 py-5" id="featured-3">

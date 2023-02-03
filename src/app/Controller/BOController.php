@@ -14,7 +14,7 @@ class BOController extends AppController{
             $entities = array('skills' => $skills, 'items' => $items, 'messages' => $messages);
             $this->render('bo',$entities);
         }else{
-            $userController = new \src\app\Controller\UserController();
+            $userController = new UserController();
             $userController->login();
         }
 

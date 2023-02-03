@@ -3,7 +3,8 @@ use src\Core\Utils\Debug;
 use src\Core\Utils\Check;
 use src\app\Controller\UserController;
 
-if((bool)getenv('admin') === true && UserController::getConnection() === true){
+$admin = false;
+if(UserController::getAdminConnection() === true){
     $admin = true;
 }
 
